@@ -1,8 +1,8 @@
 import torch
 import torch.nn as nn
-from ns_layers.Transformer_EncDec import Decoder, DecoderLayer, Encoder, EncoderLayer, ConvLayer
-from ns_layers.SelfAttention_Family import DSProbAttention, AttentionLayer
-from layers.Embed import DataEmbedding
+from ..ns_layers.Transformer_EncDec import Decoder, DecoderLayer, Encoder, EncoderLayer, ConvLayer
+from ..ns_layers.SelfAttention_Family import DSProbAttention, AttentionLayer
+from ..layers.Embed import DataEmbedding
 
 
 class Projector(nn.Module):

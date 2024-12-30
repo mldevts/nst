@@ -1,13 +1,13 @@
 import torch
 import torch.nn as nn
-from layers.Transformer_EncDec import Decoder, DecoderLayer, Encoder, EncoderLayer
-from layers.SelfAttention_Family import FullAttention, AttentionLayer
-from layers.Embed import DataEmbedding
+from ..layers.Transformer_EncDec import Decoder, DecoderLayer, Encoder, EncoderLayer, ConvLayer
+from ..layers.SelfAttention_Family import ProbAttention, AttentionLayer
+from ..layers.Embed import DataEmbedding
 
 
 class Model(nn.Module):
     """
-    Vanilla Transformer
+    Informer with Propspare attention in O(LlogL) complexity
     """
     def __init__(self, configs):
         super(Model, self).__init__()
@@ -19,19 +19,26 @@ class Model(nn.Module):
                                            configs.dropout)
         self.dec_embedding = DataEmbedding(configs.dec_in, configs.d_model, configs.embed, configs.freq,
                                            configs.dropout)
+
         # Encoder
         self.encoder = Encoder(
             [
                 EncoderLayer(
                     AttentionLayer(
-                        FullAttention(False, configs.factor, attention_dropout=configs.dropout,
-                                      output_attention=configs.output_attention), configs.d_model, configs.n_heads),
+                        ProbAttention(False, configs.factor, attention_dropout=configs.dropout,
+                                      output_attention=configs.output_attention),
+                        configs.d_model, configs.n_heads),
                     configs.d_model,
                     configs.d_ff,
                     dropout=configs.dropout,
                     activation=configs.activation
                 ) for l in range(configs.e_layers)
             ],
+            [
+                ConvLayer(
+                    configs.d_model
+                ) for l in range(configs.e_layers - 1)
+            ] if configs.distil else None,
             norm_layer=torch.nn.LayerNorm(configs.d_model)
         )
         # Decoder
@@ -39,10 +46,10 @@ class Model(nn.Module):
             [
                 DecoderLayer(
                     AttentionLayer(
-                        FullAttention(True, configs.factor, attention_dropout=configs.dropout, output_attention=False),
+                        ProbAttention(True, configs.factor, attention_dropout=configs.dropout, output_attention=False),
                         configs.d_model, configs.n_heads),
                     AttentionLayer(
-                        FullAttention(False, configs.factor, attention_dropout=configs.dropout, output_attention=False),
+                        ProbAttention(False, configs.factor, attention_dropout=configs.dropout, output_attention=False),
                         configs.d_model, configs.n_heads),
                     configs.d_model,
                     configs.d_ff,

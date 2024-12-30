@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "nst"
+version = "0.1.0"
+description = "a fork of Nonstationary_Transformer"
+authors = ["Your Name <you@example.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+pandas = "^2.2.3"
+scikit-learn = "^1.6.0"
+torchvision = "^0.20.1"
+numpy = "^2.2.1"
+torch = "^2.5.1"
+
+
+[tool.poetry.group.dev.dependencies]
+matplotlib = "^3.10.0"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
